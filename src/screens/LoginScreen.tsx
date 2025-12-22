@@ -1,139 +1,127 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { loginUser } from '@/services/auth';
+import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation/AppNavigator';
-import { AuthContext } from '@/context/AuthContext';
-import { verifyInstallation } from 'nativewind';
-// Note: `styled` helper is not exported in this nativewind version, avoid using it to prevent runtime errors.
-
 
 export const LoginScreen = () => {
+  const { login } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { login } = useContext(AuthContext);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    try {
-      verifyInstallation();
-    } catch (e: any) {
-      console.warn('NativeWind verifyInstallation failed:', e.message ?? e);
-      setError(e?.message ?? String(e));
-    }
-  }, []);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    setError('');
     if (!email || !password) {
-      setError('Please enter email and password');
+      setError('Email and password are required');
       return;
     }
 
-    setLoading(true);
     try {
-      const user = await login(email, password);
-      const roles = user.roles || [];
+      setLoading(true);
+      setError('');
 
-      // Navigate based on roles - reset stack so user cannot go back to login
-      if (roles.includes('admin')) {
-        navigation.reset({ index: 0, routes: [{ name: 'Admin' }] });
-      } else if (roles.includes('manager')) {
-        navigation.reset({ index: 0, routes: [{ name: 'Manager' }] });
-      } else {
-        navigation.reset({ index: 0, routes: [{ name: 'User' }] });
-      }
+      const data = await loginUser(email, password);
+
+      login(data.token, data.user);
+
+      // Navigate based on role
+      if (data.user.roles[0] === 'admin') navigation.navigate('Admin');
+      else if (data.user.roles[0] === 'manager') navigation.navigate('Manager');
+      else if (data.user.roles[0] === 'user') navigation.navigate('User');
+      else navigation.navigate('RoleError');
     } catch (err: any) {
-      setError(err?.message ?? 'Login failed. Please try again.');
+      setError(
+        err?.message || 'Invalid email or password'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
-      >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-8">
-          
-          {/* Header Section */}
-          <View className="mt-16 mb-10">
-            <Text className="text-3xl font-extrabold text-slate-900">Welcome Back</Text>
-            <Text className="text-slate-500 text-lg mt-2">Sign in to continue your progress.</Text>
-          </View>
+    <SafeAreaView className="flex-1 bg-slate-50 justify-center px-6">
+      
+      {/* Title */}
+      <Text className="text-3xl font-extrabold text-slate-900 mb-6 text-center">
+        Sign In
+      </Text>
 
-          {/* Debug Section: compare styles */}
-          <View className="mb-4">
-            <Text style={{ color: '#ff0000', fontSize: 18, fontWeight: '700' }}>Inline style debug - should be visible</Text>
-            <Text className="text-lg text-indigo-600 mt-2">className debug - should be indigo</Text>
-          </View>
+      {/* Card */}
+      <View className="bg-white p-6 rounded-3xl shadow-lg shadow-slate-300">
+        
+        {error && (
+          <Text className="text-red-500 mb-4">{error}</Text>
+        )}
 
-          {/* Form Section */}
-          <View className="space-y-6">
-            {error ? (
-              <Text className="text-red-600 mb-2">{error}</Text>
-            ) : null}
+        {/* Email Field */}
+        <Text className="text-sm font-medium text-slate-600 mb-2 ml-1">
+          Email Address
+        </Text>
+        <TextInput
+          placeholder="zaeem@codingcops.com"
+          value={email}
+          onChangeText={setEmail}
+          placeholderTextColor="#94a3b8"
+          autoCapitalize="none"
+          className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 mb-4 text-slate-900"
+        />
 
-            <View>
-              <Text className="text-slate-700 font-semibold mb-2 ml-1">Email Address</Text>
-              <TextInput
-                className="bg-white border border-slate-200 p-4 rounded-2xl text-slate-900 shadow-sm shadow-slate-200"
-                placeholder="name@company.com"
-                placeholderTextColor="#94a3b8"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-              />
-            </View>
+        {/* Password Field */}
+        <Text className="text-sm font-medium text-slate-600 mb-2 ml-1">
+          Password
+        </Text>
+        <View className="relative mb-4">
+          <TextInput
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+            className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 pr-12 text-slate-900"
+          />
+          <TouchableOpacity
+            className="absolute right-4 top-4"
+            onPress={() => setShowPassword(prev => !prev)}
+          >
+            <Text className="text-slate-400">
+              {showPassword ? '🙈' : '👁️'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-            <View className="mt-4">
-              <Text className="text-slate-700 font-semibold mb-2 ml-1">Password</Text>
-              <TextInput
-                className="bg-white border border-slate-200 p-4 rounded-2xl text-slate-900 shadow-sm shadow-slate-200"
-                placeholder="••••••••"
-                placeholderTextColor="#94a3b8"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-              />
-            </View>
+        {/* Forgot password */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ForgotPassword')}
+          className="mb-4"
+        >
+          <Text className="text-indigo-600 text-right text-sm font-medium">
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
 
-            <TouchableOpacity className="items-end mt-2">
-              <Text className="text-indigo-600 font-medium">Forgot Password?</Text>
-            </TouchableOpacity>
+        {/* Sign In Button */}
+        <TouchableOpacity
+          onPress={handleLogin}
+          disabled={loading}
+          className="bg-indigo-600 py-4 rounded-2xl mb-2 shadow-md shadow-indigo-300"
+        >
+          <Text className="text-white text-center text-lg font-bold">
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Text>
+        </TouchableOpacity>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              className={`w-full py-4 rounded-2xl mt-8 ${loading ? 'opacity-60' : ''}`}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#ffffff" />
-              ) : (
-                <Text className="bg-indigo-600 text-white text-center text-lg font-bold py-4 rounded-2xl">Sign In</Text>
-              )}
-            </TouchableOpacity>
-          </View>
+      </View>
 
-          {/* Footer Section */}
-          <View className="flex-row justify-center mt-auto mb-8">
-            <Text className="text-slate-500">Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-              <Text className="text-indigo-600 font-bold">Sign Up</Text>
-            </TouchableOpacity>
-          </View>
-
-        </ScrollView>
-      </KeyboardAvoidingView>
+      {/* Footer */}
+      <Text className="text-slate-400 text-center text-sm mt-6">
+        Powered by CodingCops
+      </Text>
     </SafeAreaView>
   );
 };
-
-export default LoginScreen;

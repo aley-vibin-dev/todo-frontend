@@ -7,6 +7,7 @@ import {UserDashboard} from '@/screens/UserDashboard';
 import {ManagerDashboard} from '@/screens/ManagerDashboard';
 import {AdminDashboard} from '@/screens/AdminDashboard';
 import {LandingPage} from '@/screens/LandingPage';
+import {RoleErrorScreen} from '@/screens/RoleErrorScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -15,6 +16,8 @@ export type RootStackParamList = {
   Manager: undefined;
   Admin: undefined;
   Landing: undefined;
+  ForgotPassword: undefined;
+  RoleError: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -29,6 +32,7 @@ export const AppNavigator = () => {
         <Stack.Screen name="User" component={UserDashboard} />
         <Stack.Screen name="Manager" component={ManagerDashboard} />
         <Stack.Screen name="Admin" component={AdminDashboard} />
+        <Stack.Screen name="RoleError" component={RoleErrorScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

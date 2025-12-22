@@ -1,4 +1,4 @@
-// src/api/api.ts
+import {BASE_URL} from '@env';
 let authToken: string | undefined;
 
 export const setAuthToken = (token?: string) => {
@@ -7,7 +7,7 @@ export const setAuthToken = (token?: string) => {
 
 const API = {
   post: async (path: string, body: unknown) => {
-    const res = await fetch(`http://localhost:4000${path}`, {
+    const res = await fetch(`${BASE_URL}${path}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -15,7 +15,25 @@ const API = {
       },
       body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error('API error');
+    if (!res.ok) {
+      const errorBody = await res.json().catch(() => null);
+      throw new Error(errorBody?.message || 'API error');
+    }
+    const data = await res.json();
+    return { data };
+  },
+  get: async (path: string) => {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      },
+    });
+    if (!res.ok) {
+      const errorBody = await res.json().catch(() => null);
+      throw new Error(errorBody?.message || 'API error');
+    }
     const data = await res.json();
     return { data };
   },
