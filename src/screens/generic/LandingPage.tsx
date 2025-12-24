@@ -36,20 +36,43 @@ export const LandingPage = () => {
           className="items-center mt-10"
         >
           {/* Logo Container */}
-          <View className="bg-white p-6 rounded-3xl shadow-xl shadow-slate-300">
+          {/* <View className="bg-white p-6 rounded-3xl shadow-xl shadow-slate-300">
             <Image
-              source={require('@/../assets/favicon.png')} 
+              source={require('@/../assets/codingcops-logo.png')} 
               className="w-32 h-32"
               resizeMode="contain"
             />
-          </View>
+          </View> */}
           
-          <Text className="text-4xl font-extrabold mt-8 text-slate-900 tracking-tight">
-            CodingCops
+          <Text className="text-3xl font-extrabold mt-8 tracking-wide p-4 bg-blue-100" 
+          style={{borderWidth: 1, 
+            borderColor: '#3B82F6',
+            borderRadius: 10,
+            shadowColor: '#005aeaff',           // white shadow
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 1,
+            shadowRadius: 30,
+            elevation: 30,  }}>
+            <Text className="text-indigo-600">Cop</Text>
+            <Text className="text-green-600">Ops</Text>
           </Text>
-          <Text className="text-slate-500 text-center mt-2 text-lg px-4">
+
+
+          <Text className="text-slate-500 text-center mt-10 text-lg px-4">
             Master your tasks with precision and security.
           </Text>
+
+          <Text className="text-slate-400 text-center mt-60 text-medium px-4">
+            Powered By
+          </Text>
+
+          <View className="bg-white px-8 mt-4 rounded-3xl shadow-xl shadow-slate-300">
+            <Image
+              source={require('@/../assets/codingcops-logo.png')} 
+              className="w-20 h-20"
+              resizeMode="contain"
+            />
+          </View>
         </Animated.View>
 
         {/* Bottom Section: Action Buttons */}
@@ -57,7 +80,7 @@ export const LandingPage = () => {
           <TouchableOpacity
             activeOpacity={0.8}
             className="bg-indigo-600 w-full py-4 rounded-2xl shadow-lg shadow-indigo-300"
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => navigation.navigate('Login', {})}
           >
             <Text className="text-white text-center text-lg font-bold">
               Sign In

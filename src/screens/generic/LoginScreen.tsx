@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { loginUser } from '@/services/auth';
@@ -6,10 +6,20 @@ import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation/AppNavigator';
+import {RouteProp, useRoute} from '@react-navigation/native'
 
 export const LoginScreen = () => {
   const { login } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'Login'>>();
+  const sessionout_error = route.params?.sessionout_error ?? false;
+
+  useEffect(() => {
+    if (sessionout_error == true) {
+      setError('Your session has expired. Please login again.');
+    }
+  }, [sessionout_error]);
+
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
