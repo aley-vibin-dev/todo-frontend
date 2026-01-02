@@ -4,19 +4,44 @@ import { AdminLayout } from '@/components/admin/AdminLayout';
 import { StatsGrid } from '@/components/dashboard/StatsGrid';
 import { ChartCard } from '@/components/dashboard/ChartCard';
 import { DashboardSection } from '@/components/dashboard/DashboardSection';
-import { getDashboardStats } from '@/services/admin';
+import { getDashboardChart, getDashboardStats } from '@/services/admin';
 
 export const AdminHome = () => {
   const [stats, setStats] = useState<
     { id: number; title: string; value: number; icon: string }[]
   >([]);
+  const [chart, setChart] = useState<
+    { name: string; value: number; color: string; legendFontColor: string; legendFontSize: number; }[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
-  const chartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr'],
-    datasets: [{ data: [30, 50, 40, 70] }],
-  };
+//fetching chart data
+  useEffect(() => {
+    const fetchchart = async () => {
+      try {
+        const data = await getDashboardChart();
 
+        const chart_data = [
+          { name: 'Completed', value: data.completed, color: '#13ab3eff', legendFontColor: '#333', legendFontSize: 12 },
+          { name: 'Rejected', value: data.rejected, color: '#c40808ff', legendFontColor: '#333', legendFontSize: 12 },
+          { name: 'assigned', value: data.assigned, color: '#445befff', legendFontColor: '#333', legendFontSize: 12 },
+          { name: 'Submitted', value: data.submitted, color: '#f0e909ff', legendFontColor: '#333', legendFontSize: 12 },
+          { name: 'Approved', value: data.approved, color: '#970c8eff', legendFontColor: '#333', legendFontSize: 12 },
+          { name: 'Deleted', value: data.deleted, color: '#5d5b5bff', legendFontColor: '#333', legendFontSize: 12 },
+        ];
+
+        setChart(chart_data);
+      } catch (err) {
+        console.error('Failed to fetch dashboard chart:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchchart();
+  }, []);
+  
+//fetching stats data
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -51,7 +76,7 @@ export const AdminHome = () => {
         </DashboardSection>
 
         <DashboardSection title="Charts">
-          <ChartCard title="Task Progress" type="line" data={chartData} />
+          <ChartCard title="Task Progress" type="pie" data={chart} />
         </DashboardSection>
       </ScrollView>
     </AdminLayout>

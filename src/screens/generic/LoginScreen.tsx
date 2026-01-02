@@ -91,6 +91,7 @@ export const LoginScreen = () => {
           <TextInput
             placeholder="Enter your password"
             value={password}
+            autoCapitalize='none'
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
             className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 pr-12 text-slate-900"
