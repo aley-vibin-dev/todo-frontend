@@ -43,11 +43,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, sidebarWi
           <TouchableOpacity onPress={() => navigation.navigate('ManageResources')} className="mb-4">
             <Text className="text-white text-lg mt-2">👨🏻‍💼 Manage Resources</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('ApproveResources')} className="mb-4">
+            <Text className="text-white text-lg mt-2">✅ Approve Resources</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('DeleteResource')} className="mb-4">
-            <Text className="text-white text-lg mt-2">❌ Delete Resource</Text>
+            <Text className="text-white text-lg mt-2">❌ Remove Resources</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('ResourceProgress')} className="mb-4">
-            <Text className="text-white text-lg mt-2">📈 Resource Progress</Text>
+            <Text className="text-white text-lg mt-2">📈 Resources Progress</Text>
           </TouchableOpacity>
         </View>
       </View>

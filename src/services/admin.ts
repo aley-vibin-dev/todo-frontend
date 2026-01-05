@@ -15,6 +15,18 @@ export interface DashboardChart {
   completed: number;
 }
 
+export interface PendingResources {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface ResourceUpdate {
+  id: number;
+  status: 'manager' | 'user' | 'reject';
+}
+
+
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   const { data } = await api.get('/admin/dashboard-stats');
   return data;
@@ -22,5 +34,15 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 
 export const getDashboardChart = async (): Promise<DashboardChart> => {
   const { data } = await api.get('/admin/dashboard-chart');
+  return data;
+};
+
+export const getPendingResources = async (): Promise<PendingResources[]> => {
+  const { data } = await api.get('/admin/pending-resources');
+  return data;
+};
+
+export const updateResourceStatus = async (updates: ResourceUpdate[]) => {
+  const { data } = await api.post('/admin/resource-status', updates);
   return data;
 };

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text } from 'react-native';
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { StatsGrid } from '@/components/dashboard/StatsGrid';
-import { ChartCard } from '@/components/dashboard/ChartCard';
-import { DashboardSection } from '@/components/dashboard/DashboardSection';
+import { StatsGrid } from '@/components/common/StatsGrid';
+import { ChartCard } from '@/components/common/ChartCard';
+import { DashboardSection } from '@/components/common/DashboardSection';
 import { getDashboardChart, getDashboardStats } from '@/services/admin';
 
 export const AdminHome = () => {
