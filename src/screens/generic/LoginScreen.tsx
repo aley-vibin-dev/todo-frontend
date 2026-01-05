@@ -15,8 +15,10 @@ export const LoginScreen = () => {
   const sessionout_error = route.params?.sessionout_error ?? false;
 
   useEffect(() => {
-    if (sessionout_error == true) {
+    if (sessionout_error === true) {
       setError('Your session has expired. Please login again.');
+      
+      navigation.setParams({ sessionout_error: undefined } as any);
     }
   }, [sessionout_error]);
 

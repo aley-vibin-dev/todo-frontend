@@ -5,6 +5,7 @@ import { ManageResources } from '@/screens/admin/ManageResources';
 import { DeleteResource } from '@/screens/admin/DeleteResource';
 import { ResourceProgress } from '@/screens/admin/ResourceProgress';
 import { AdminSettings } from '@/screens/admin/AdminSettings';
+import { ApproveResources } from '@/screens/admin/ApproveResource'
 
 const Stack = createNativeStackNavigator();
 
@@ -14,6 +15,7 @@ export type AdminStackParamList = {
   DeleteResource: undefined;
   ResourceProgress: undefined;
   AdminSettings: undefined;
+  ApproveResources: undefined;
 };
 export const AdminNavigator = () => {
   return (
@@ -23,7 +25,7 @@ export const AdminNavigator = () => {
       <Stack.Screen name="DeleteResource" component={DeleteResource} />
       <Stack.Screen name="ResourceProgress" component={ResourceProgress} />
       <Stack.Screen name="AdminSettings" component={AdminSettings} />
-
+      <Stack.Screen name="ApproveResources" component={ApproveResources}/>
     </Stack.Navigator>
   );
 };
