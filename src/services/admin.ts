@@ -26,6 +26,18 @@ export interface ResourceUpdate {
   status: 'manager' | 'user' | 'reject';
 }
 
+export interface Manager {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  manage_id: number;
+}
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   const { data } = await api.get('/admin/dashboard-stats');
@@ -44,5 +56,23 @@ export const getPendingResources = async (): Promise<PendingResources[]> => {
 
 export const updateResourceStatus = async (updates: ResourceUpdate[]) => {
   const { data } = await api.post('/admin/resource-status', updates);
+  return data;
+};
+
+export const getManagers = async (): Promise<Manager[]> => {
+  const { data } = await api.get('/admin/get-managers');
+  return data;
+};
+
+export const getUsers = async (): Promise<User[]> => {
+  const { data } = await api.get('/admin/get-users');
+  return data;
+};
+
+export const bulkAssignUsers = async (payload: {
+  userIds: number[];
+  managerId: number | null;
+}) => {
+  const { data } = await api.post('/admin/assign-users-to-manager', payload);
   return data;
 };

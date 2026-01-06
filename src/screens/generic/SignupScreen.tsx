@@ -30,18 +30,32 @@ export const SignupScreen = () => {
       return;
     }
 
-    try {
-      setLoading(true);
-      setError('');
+    setLoading(true);
+    setError('');
 
+    try {
       await signupUser(name, email, password);
 
-      // After successful signup → go to Login
-      navigation.navigate('Login');
+      // Clear form after successful signup
+      setName('');
+      setEmail('');
+      setPassword('');
+
+      // Navigate to Login
+      navigation.navigate('Login', { sessionout_error: false });
     } catch (err: any) {
-      setError(err?.message || 'Signup failed');
+      // Handle specific email-in-use error
+      if (err.message === 'Email is already in use') {
+        setError(
+          'This email is already registered. Please login or use another email.'
+        );
+        setEmail('');
+        setPassword('');
+      } else {
+        setError(err?.message || 'Signup failed');
+      }
     } finally {
-      setLoading(false);
+      setLoading(false); // ensures button is re-enabled
     }
   };
 
@@ -52,7 +66,7 @@ export const SignupScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View className="flex-1 px-6 justify-center">
-          
+
           {/* Header */}
           <View className="mb-10">
             <Text className="text-3xl font-extrabold text-slate-900">
@@ -65,9 +79,7 @@ export const SignupScreen = () => {
 
           {/* Error */}
           {error ? (
-            <Text className="text-red-500 mb-4 text-center">
-              {error}
-            </Text>
+            <Text className="text-red-500 mb-4 text-center">{error}</Text>
           ) : null}
 
           {/* Form */}
@@ -75,6 +87,7 @@ export const SignupScreen = () => {
             <TextInput
               placeholder="Full Name"
               value={name}
+              autoCapitalize='words'
               onChangeText={setName}
               placeholderTextColor="#94a3b8"
               className="bg-white border border-slate-200 rounded-xl px-4 py-4 text-slate-900"
@@ -114,16 +127,13 @@ export const SignupScreen = () => {
 
           {/* Footer */}
           <View className="flex-row justify-center mt-6">
-            <Text className="text-slate-500">
-              Already have an account?
-            </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text className="text-indigo-600 font-bold ml-1">
-                Sign In
-              </Text>
+            <Text className="text-slate-500">Already have an account? go to</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Login', { sessionout_error: false })}
+            >
+              <Text className="text-blue-600 font-bold ml-1">Sign In</Text>
             </TouchableOpacity>
           </View>
-
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

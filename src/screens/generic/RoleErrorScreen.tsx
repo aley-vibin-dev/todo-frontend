@@ -4,8 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation/AppNavigator';
+import { useAuth } from '@/context/AuthContext';
 
 export const RoleErrorScreen = () => {
+  const {logout} = useAuth();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -31,7 +33,10 @@ export const RoleErrorScreen = () => {
 
         {/* Button */}
         <TouchableOpacity
-          onPress={() => navigation.navigate('Landing')}
+          onPress={async () => {
+            await logout();
+            navigation.navigate('Landing');
+          }}
           className="bg-indigo-600 py-4 rounded-2xl shadow-md shadow-indigo-300"
         >
           <Text className="text-white text-center text-lg font-bold">

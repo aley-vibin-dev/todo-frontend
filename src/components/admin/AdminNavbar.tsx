@@ -4,7 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AdminStackParamList } from '@/navigation/AdminNavigator';
-import { RootStackParamList } from '@/navigation/AppNavigator';
 
 interface AdminNavbarProps {
   collapsed: boolean;
@@ -20,14 +19,11 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({
   const { user, logout } = useAuth();
   const navigationAdmin =
     useNavigation<NativeStackNavigationProp<AdminStackParamList>>();
-  const navigationRoot =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   // Redirect if no roles
   React.useEffect(() => {
-    if (!user?.roles || user.roles.length === 0) {
+    if (!user?.role) {
       logout();
-      navigationRoot.navigate('Login', { sessionout_error: true });
     }
   }, [user]);
 
@@ -46,7 +42,7 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({
             activeOpacity={0.7}
           >
             <Text className="text-white font-semibold">
-              👨🏻‍💼 {user?.roles?.join(', ')} {showDropdown ? '▲' : '▼'}
+              👨🏻‍💼 {user?.role} {showDropdown ? '▲' : '▼'}
             </Text>
           </TouchableOpacity>
         )}
@@ -71,7 +67,6 @@ export const AdminNavbar: React.FC<AdminNavbarProps> = ({
               onPress={() => {
                 setShowDropdown(false);
                 logout();
-                navigationRoot.navigate('Landing');
               }}
             >
               <Text className="text-red-500 font-semibold">🚪 Sign Out</Text>

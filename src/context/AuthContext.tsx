@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setAuthToken } from '@/api/api';
+import { CommonActions } from '@react-navigation/native'; // ✅
+import { navigationRef } from '@/navigation/RootNavigation'; // ✅
+import { RootStackParamList } from '@/navigation/AppNavigator'; // ✅
 
 type UserRole = 'admin' | 'manager' | 'user';
 
@@ -8,14 +11,14 @@ interface User {
   id: string;
   name: string;
   email: string;
-  roles: UserRole[];
+  role: UserRole;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (token: string, user: User) => void;
-  logout: () => Promise<void>; // Changed to Promise because of AsyncStorage
+  logout: () => Promise<void>;
   loading: boolean;
 }
 
@@ -28,7 +31,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load stored auth data on app launch
   useEffect(() => {
     const loadStorageData = async () => {
       try {
@@ -38,10 +40,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         if (storedToken && storedUser) {
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
-          setAuthToken(storedToken); // Set axios header
+          setAuthToken(storedToken);
         }
       } catch (e) {
-        console.error("Failed to load auth state", e);
+        console.error('Failed to load auth state', e);
       } finally {
         setLoading(false);
       }
@@ -54,32 +56,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setToken(newToken);
       setUser(newUser);
       setAuthToken(newToken);
-      
-      // Persist data
+
       await AsyncStorage.setItem('@auth_token', newToken);
       await AsyncStorage.setItem('@user_data', JSON.stringify(newUser));
-      // Initialize activity timer
       await AsyncStorage.setItem('@last_activity_time', Date.now().toString());
     } catch (e) {
-      console.error("Login storage failed", e);
+      console.error('Login storage failed', e);
     }
   };
 
   const logout = async () => {
     try {
-      // 1. Clear State
       setToken(null);
       setUser(null);
-      setAuthToken(undefined); // Use undefined to match your API helper type
+      setAuthToken(undefined);
 
-      // 2. Clear All Storage (Including inactivity time)
       await AsyncStorage.multiRemove([
-        '@auth_token', 
-        '@user_data', 
-        '@last_activity_time'
+        '@auth_token',
+        '@user_data',
+        '@last_activity_time',
       ]);
+
+      // Reset navigation stack to Landing
+      if (navigationRef.isReady()) {
+        navigationRef.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Landing' as keyof RootStackParamList }],
+          })
+        );
+      }
     } catch (e) {
-      console.error("Logout failed", e);
+      console.error('Logout failed', e);
     }
   };
 

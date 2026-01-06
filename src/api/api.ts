@@ -17,7 +17,7 @@ const API = {
     });
     if (!res.ok) {
       const errorBody = await res.json().catch(() => null);
-      throw new Error(errorBody?.message || 'API error');
+      throw new Error(errorBody?.message || errorBody?.error || 'API error');
     }
     const data = await res.json();
     return { data };

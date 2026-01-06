@@ -44,14 +44,16 @@ export const LoginScreen = () => {
       login(data.token, data.user);
 
       // Navigate based on role
-      if (data.user.roles[0] === 'admin') navigation.navigate('Admin');
-      else if (data.user.roles[0] === 'manager') navigation.navigate('Manager');
-      else if (data.user.roles[0] === 'user') navigation.navigate('User');
+      if (data.user.role === 'admin') navigation.navigate('Admin');
+      else if (data.user.role === 'manager') navigation.navigate('Manager');
+      else if (data.user.role === 'user') navigation.navigate('User');
       else navigation.navigate('RoleError');
     } catch (err: any) {
       setError(
-        err?.message || 'Invalid email or password'
+        err?.message + '!' || 'Invalid email or password!'
       );
+      setEmail('');
+      setPassword('');
     } finally {
       setLoading(false);
     }

@@ -7,7 +7,7 @@ interface LoginResponse {
     id: string;
     name: string;
     email: string;
-    roles: UserRole[];
+    role: UserRole;
   };
 }
 
