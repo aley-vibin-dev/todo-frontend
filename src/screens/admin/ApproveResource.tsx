@@ -1,13 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Alert, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { 
+  View, 
+  Text, 
+  Alert, 
+  ActivityIndicator, 
+  RefreshControl, 
+  ScrollView 
+} from 'react-native';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { DashboardSection } from '@/components/common/DashboardSection';
 import { ActionTable, TableAction } from '@/components/common/Table';
-import { PendingResources, ResourceUpdate, getPendingResources, updateResourceStatus } from '@/services/admin';
+import { 
+  PendingResources, 
+  ResourceUpdate, 
+  getPendingResources, 
+  updateResourceStatus 
+} from '@/services/admin';
 
 export const ApproveResources = () => {
   const [resources, setResources] = useState<PendingResources[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const actions: TableAction[] = [
     { label: 'Approve as Manager', value: 'manager' },
@@ -15,26 +28,32 @@ export const ApproveResources = () => {
     { label: 'Reject', value: 'reject' },
   ];
 
-  // Fetch pending resources from backend
-  const fetchResources = async () => {
+  const fetchResources = useCallback(async (isSilent = false) => {
     try {
-      setLoading(true);
+      if (!isSilent) setLoading(true);
       const data = await getPendingResources();
-      setResources(data); // ✅ array of resources
+      setResources(data);
     } catch (err) {
       console.error(err);
       Alert.alert('Error', 'Failed to fetch pending resources');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchResources();
-  }, []);
+  }, [fetchResources]);
 
-  // Handle save from table
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchResources(true);
+  };
+
   const handleSaveChanges = async (updates: Record<number, TableAction>) => {
+    if (Object.keys(updates).length === 0) return;
+
     try {
       const payload: ResourceUpdate[] = Object.entries(updates).map(([id, action]) => ({
         id: Number(id),
@@ -43,7 +62,7 @@ export const ApproveResources = () => {
 
       await updateResourceStatus(payload);
 
-      // Remove updated resources from table
+      // Remove updated resources from the list
       const updatedIds = payload.map(p => p.id);
       setResources(prev => prev.filter(r => !updatedIds.includes(r.id)));
 
@@ -56,22 +75,28 @@ export const ApproveResources = () => {
 
   return (
     <AdminLayout>
-      <View className="flex-1 p-4">
+      <ScrollView
+        className="flex-1 p-4"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <DashboardSection title="Approve Resources">
-          {loading && (
-            <View className="py-12 items-center">
+          {loading ? (
+            <View className="py-12 items-center justify-center">
               <ActivityIndicator size="large" color="#4f46e5" />
-              <Text className="mt-4 text-slate-500">Loading resources...</Text>
+              <Text className="mt-4 text-slate-500 font-medium">
+                Loading requests...
+              </Text>
             </View>
-          )}
-
-          {!loading && resources.length === 0 && (
-            <View className="py-12 items-center">
-              <Text className="text-slate-400">No pending resources to approve</Text>
+          ) : resources.length === 0 ? (
+            <View className="py-12 items-center justify-center bg-white rounded-2xl shadow-sm border border-slate-100">
+              <Text className="text-slate-400 text-lg">✨ All caught up!</Text>
+              <Text className="text-slate-400 text-sm mt-1">
+                No pending resources to approve
+              </Text>
             </View>
-          )}
-
-          {!loading && resources.length > 0 && (
+          ) : (
             <ActionTable<PendingResources>
               columns={[
                 { key: 'name', label: 'Name', flex: 1.2 },
@@ -83,7 +108,7 @@ export const ApproveResources = () => {
             />
           )}
         </DashboardSection>
-      </View>
+      </ScrollView>
     </AdminLayout>
   );
 };
