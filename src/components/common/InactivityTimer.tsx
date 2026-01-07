@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 
-const INACTIVITY_TIMEOUT = 0.5 * 60 * 1000; // 5 Minutes
+const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 Minutes
 const STORAGE_KEY = '@last_activity_time';
 
 export const InactivityTimer: React.FC<{ children: React.ReactNode }> = ({ children }) => {

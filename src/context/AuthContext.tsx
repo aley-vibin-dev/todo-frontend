@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setAuthToken } from '@/api/api';
-import { CommonActions } from '@react-navigation/native'; // ✅
-import { navigationRef } from '@/navigation/RootNavigation'; // ✅
-import { RootStackParamList } from '@/navigation/AppNavigator'; // ✅
+import { CommonActions } from '@react-navigation/native';
+import { navigationRef } from '@/navigation/RootNavigation';
 
 type UserRole = 'admin' | 'manager' | 'user';
 
@@ -24,9 +23,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,9 +35,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const storedUser = await AsyncStorage.getItem('@user_data');
 
         if (storedToken && storedUser) {
+          // IMPORTANT: Set token in the API module immediately
+          setAuthToken(storedToken);
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
-          setAuthToken(storedToken);
         }
       } catch (e) {
         console.error('Failed to load auth state', e);
@@ -53,13 +51,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (newToken: string, newUser: User) => {
     try {
+      // 1. Sync Memory & API
+      setAuthToken(newToken);
       setToken(newToken);
       setUser(newUser);
-      setAuthToken(newToken);
 
-      await AsyncStorage.setItem('@auth_token', newToken);
-      await AsyncStorage.setItem('@user_data', JSON.stringify(newUser));
-      await AsyncStorage.setItem('@last_activity_time', Date.now().toString());
+      // 2. Sync Persistence
+      await AsyncStorage.multiSet([
+        ['@auth_token', newToken],
+        ['@user_data', JSON.stringify(newUser)],
+        ['@last_activity_time', Date.now().toString()]
+      ]);
     } catch (e) {
       console.error('Login storage failed', e);
     }
@@ -67,22 +69,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     try {
+      // 1. Clear Memory & API module
+      setAuthToken(undefined);
       setToken(null);
       setUser(null);
-      setAuthToken(undefined);
 
+      // 2. Clear Persistence
       await AsyncStorage.multiRemove([
         '@auth_token',
         '@user_data',
         '@last_activity_time',
       ]);
 
-      // Reset navigation stack to Landing
+      // 3. Navigate to Landing and Clear Stack History
       if (navigationRef.isReady()) {
         navigationRef.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: 'Landing' as keyof RootStackParamList }],
+            routes: [{ name: 'Landing' }],
           })
         );
       }
@@ -100,8 +104,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used inside AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used inside AuthProvider');
   return context;
 };

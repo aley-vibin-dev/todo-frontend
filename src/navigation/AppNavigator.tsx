@@ -2,11 +2,10 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
-
 import {LoginScreen} from '@/screens/generic/LoginScreen';
 import {SignupScreen} from '@/screens/generic/SignupScreen';
 import {UserNavigator} from './UserNavigator';
-import {AdminNavigator} from './AdminNavigator';
+import {AdminNavigator, AdminStackParamList} from './AdminNavigator';
 import {ManagerNavigator} from './ManagerNavigator';
 import {LandingPage} from '@/screens/generic/LandingPage';
 import {RoleErrorScreen} from '@/screens/generic/RoleErrorScreen';
@@ -16,7 +15,7 @@ export type RootStackParamList = {
   Signup: undefined;
   User: undefined;
   Manager: undefined;
-  Admin: undefined;
+  Admin: { screen?: keyof AdminStackParamList } | undefined; // <-- allow nested screens
   Landing: undefined;
   ForgotPassword: undefined;
   RoleError: undefined;

@@ -22,8 +22,8 @@ export const AdminHome = () => {
         const data = await getDashboardChart();
 
         const chart_data = [
-          { name: 'Completed', value: data.completed, color: '#13ab3eff', legendFontColor: '#333', legendFontSize: 12 },
-          { name: 'Rejected', value: data.rejected, color: '#c40808ff', legendFontColor: '#333', legendFontSize: 12 },
+          { name: 'Completed', value: data.completed? 0 : 10, color: '#13ab3eff', legendFontColor: '#333', legendFontSize: 12 },
+          { name: 'Rejected', value: data.rejected? 0 : 50, color: '#c40808ff', legendFontColor: '#333', legendFontSize: 12 },
           { name: 'assigned', value: data.assigned, color: '#445befff', legendFontColor: '#333', legendFontSize: 12 },
           { name: 'Submitted', value: data.submitted, color: '#f0e909ff', legendFontColor: '#333', legendFontSize: 12 },
           { name: 'Approved', value: data.approved, color: '#970c8eff', legendFontColor: '#333', legendFontSize: 12 },
