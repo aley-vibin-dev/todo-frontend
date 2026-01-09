@@ -36,7 +36,15 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  manage_id: number;
+  manager_id: number;
+}
+
+export interface getAllResources {
+  id: number;
+  name: string;
+  email: string;
+  role: 'admin' | 'manager' | 'user';
+  manager_id: number;
 }
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
@@ -74,5 +82,10 @@ export const bulkAssignUsers = async (payload: {
   managerId: number | null;
 }) => {
   const { data } = await api.post('/admin/assign-users-to-manager', payload);
+  return data;
+};
+
+export const getAllResources = async (): Promise<User[]> => {
+  const { data } = await api.get('/admin/get-all-resources');
   return data;
 };

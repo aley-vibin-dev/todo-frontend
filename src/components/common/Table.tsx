@@ -17,6 +17,7 @@ export interface ActionTableProps<T> {
   data: T[];
   actions: TableAction[];
   onSaveChanges: (updates: Record<number, TableAction>) => Promise<void>;
+  refreshControl?: React.ReactElement;
 }
 
 // --- 1. Memoized Row Component ---

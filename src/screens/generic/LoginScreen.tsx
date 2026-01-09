@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { loginUser } from '@/services/auth';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -60,7 +59,7 @@ export const LoginScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50 justify-center px-6">
+    <View className="flex-1 bg-slate-50 justify-center px-6">
       
       {/* Title */}
       <Text className="text-3xl font-extrabold text-slate-900 mb-6 text-center">
@@ -105,21 +104,29 @@ export const LoginScreen = () => {
             onPress={() => setShowPassword(prev => !prev)}
           >
             <Text className="text-slate-400">
-              {showPassword ? '🙈' : '👁️'}
+              {showPassword ? '🔐' : '🔓'}
             </Text>
           </TouchableOpacity>
         </View>
+        <View className="flex-row justify-between mb-4">
+          {/* This will stay on the Left */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Signup')}
+          >
+            <Text className="text-indigo-600 text-sm font-medium">
+              Don't have an account?
+            </Text>
+          </TouchableOpacity>
 
-        {/* Forgot password */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate('ForgotPassword')}
-          className="mb-4"
-        >
-          <Text className="text-indigo-600 text-right text-sm font-medium">
-            Forgot Password?
-          </Text>
-        </TouchableOpacity>
-
+          {/* This will be pushed to the Right */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ForgotPassword')}
+          >
+            <Text className="text-red-600 text-sm font-medium">
+              Forgot Password?
+            </Text>
+          </TouchableOpacity>
+        </View>
         {/* Sign In Button */}
         <TouchableOpacity
           onPress={handleLogin}
@@ -137,6 +144,6 @@ export const LoginScreen = () => {
       <Text className="text-slate-400 text-center text-sm mt-6">
         Powered by CodingCops
       </Text>
-    </SafeAreaView>
+    </View>
   );
 };

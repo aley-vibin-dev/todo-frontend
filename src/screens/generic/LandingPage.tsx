@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, View, Text, Image, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation/AppNavigator';
@@ -27,7 +26,7 @@ export const LandingPage = () => {
   }, [scaleAnim, fadeAnim]);
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-50">
       <View className="flex-1 items-center justify-between py-16 px-8">
         
         {/* Top Section: Logo & Branding */}
@@ -35,14 +34,6 @@ export const LandingPage = () => {
           style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}
           className="items-center mt-10"
         >
-          {/* Logo Container */}
-          {/* <View className="bg-white p-6 rounded-3xl shadow-xl shadow-slate-300">
-            <Image
-              source={require('@/../assets/codingcops-logo.png')} 
-              className="w-32 h-32"
-              resizeMode="contain"
-            />
-          </View> */}
           
           <Text className="text-3xl font-extrabold mt-8 tracking-wide p-4 bg-blue-100" 
           style={{borderWidth: 1, 
@@ -103,6 +94,6 @@ export const LandingPage = () => {
         </View>
 
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
