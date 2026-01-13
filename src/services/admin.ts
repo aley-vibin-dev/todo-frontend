@@ -47,6 +47,13 @@ export interface getAllResources {
   manager_id: number;
 }
 
+
+export interface UpdateResourcePayload {
+  id: number;
+  role?: 'admin' | 'manager' | 'user';
+  deleted?: boolean;
+}
+
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   const { data } = await api.get('/admin/dashboard-stats');
   return data;
@@ -85,7 +92,16 @@ export const bulkAssignUsers = async (payload: {
   return data;
 };
 
-export const getAllResources = async (): Promise<User[]> => {
+export const getAllResources = async (): Promise<getAllResources[]> => {
   const { data } = await api.get('/admin/get-all-resources');
   return data;
+};
+
+export const updateResources = async (resources: UpdateResourcePayload[]): Promise<void> => {
+  try {
+    await api.post('/admin/update-resources', { resources });
+  } catch (error: any) {
+    console.error('Failed to update resources:', error.response?.data || error.message);
+    throw new Error('Failed to update resources');
+  }
 };
