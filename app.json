@@ -3,6 +3,21 @@
     "userInterfaceStyle": "automatic",
     "web": {
       "bundler": "metro"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d6465d3d-6239-4a80-a3a9-cec410788854"
+      }
+    },
+    "android": {
+      "package": "com.aleyvibindev.todofrontend"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d6465d3d-6239-4a80-a3a9-cec410788854"
+    },
+    "ios": {}
   }
 }

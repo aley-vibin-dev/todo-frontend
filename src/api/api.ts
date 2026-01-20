@@ -1,4 +1,4 @@
-import {BASE_URL} from '@env';
+import {BASE_URL} from '../config';
 let authToken: string | undefined;
 
 export const setAuthToken = (token?: string) => {

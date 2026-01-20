@@ -10,7 +10,6 @@ expo-env.d.ts
 env.d.ts
 
 # Local env (do NOT commit secrets)
-.env
 .env.local
 .env.*.local
 
