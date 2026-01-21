@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { Eye, Trash2, Pencil, Check, X, ArrowLeft } from 'lucide-react-native';
+import { Eye, Trash2, ArrowLeft } from 'lucide-react-native';
 import { Picker } from '@react-native-picker/picker';
 import { ManagerLayout } from '@/components/manager/ManagerLayout';
 import { getViewTasks, updateViewTasks } from '@/services/manager';
@@ -81,8 +81,6 @@ export const ViewTasks = () => {
     );
   };
 
-  /* ---------- Submit (Mock) ---------- */
-
   const submitChanges = async () => {
     try {
       const updatedTasks = tasks
@@ -99,23 +97,39 @@ export const ViewTasks = () => {
         .filter(t => t.isDeleted)
         .map(t => t.id);
 
-      const payload = {
+      await updateViewTasks({
         tasks: updatedTasks,
         deletedTasksIds,
-      };
-
-      await updateViewTasks(payload);
+      });
 
       Alert.alert(
         'Success',
         `Updated ${updatedTasks.length} task(s), deleted ${deletedTasksIds.length} task(s)`
       );
-    } catch (err: any) {
-      console.error('Submit changes error:', err);
-      Alert.alert(
-        'Error',
-        err?.message || 'Failed to submit task changes'
+
+      // 🔹 UI refresh fix: update state so screen shows latest data immediately
+      setTasks(prev =>
+        prev
+          .filter(t => !t.isDeleted)  // remove deleted tasks
+          .map(t => ({
+            ...t,
+            isDirty: false,           // reset dirty flags
+            isEditing: false,
+            isExpanded: false,
+          }))
       );
+
+      setOriginalTasks(prev =>
+        prev
+          .filter(t => !deletedTasksIds.includes(t.id))  // remove deleted tasks
+          .map(t => ({
+            ...t,
+            ...updatedTasks.find(u => u.id === t.id) || t, // merge updated values
+          }))
+      );
+
+    } catch (err: any) {
+      Alert.alert('Error', err?.message || 'Failed to submit task changes');
     }
   };
 

@@ -4,6 +4,11 @@ export interface DashboardStats {
   myResources: number;
 }
 
+interface BulkAssignedTasksPayload{
+  resourceId: number;
+  taskId: number;
+}
+
 interface TaskPayload {
   title: string;
   description: string;
@@ -28,15 +33,25 @@ interface BulkViewTasksPayload {
   deletedTasksIds: number[];
 }
 
+export interface Resources {
+  id: number;
+  name: string;
+}
+
+interface AssignTasks {
+  Tasks: ViewTasks[];
+  myResources: Resources[];
+
+}
+
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   const { data } = await api.get('/manager/dashboard-stats');
   return data;
 };
 
 export const bulkCreateTasks = async (payload: BulkCreateTasksPayload) => {
-  console.log("Payload", payload);
   const { data } = await api.post('/manager/create-tasks', payload);
-  return data; // backend should return { createdCount: number } or similar
+  return data;
 };
 
 export const getViewTasks = async (): Promise<ViewTasks[]> => {
@@ -51,7 +66,16 @@ export const updateViewTasks = async (payload: BulkViewTasksPayload) => {
   catch(err: any){
     console.log("Api Error: ", err.message);
   }
-  finally{
-      console.log("View Tasks Payload", payload);
-  }
+};
+
+export const getAssignTasks = async (): Promise<AssignTasks> => {
+  const { data } = await api.get('/manager/get-assign-tasks');
+  return data;
+};
+
+export const updateAssignTasks = async (
+  payload: BulkAssignedTasksPayload[]
+) => {
+  const { data } = await api.post('/manager/update-assign-tasks', payload);
+  return data;
 };
