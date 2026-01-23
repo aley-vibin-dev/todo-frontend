@@ -104,6 +104,9 @@ export const UserSidebar: React.FC<UserSidebarProps> = ({
         <View className="border-t border-gray-500 pt-8">
           <MenuItem label="Home" icon="🏠" routeName="UserHome" marginTop="mt-4" />
         </View>
+        <View className="border-t border-gray-500 pt-8">
+          <MenuItem label="Assigned Tasks" icon=":)" routeName="AssignedTasks" marginTop="mt-4" />
+        </View>
       </View>
 
       {/* Footer */}

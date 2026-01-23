@@ -14,26 +14,6 @@ export const UserHome = () => {
     { name: string; value: number; color: string; legendFontColor: string; legendFontSize: number; }[]
   >([]);
   const [loading, setLoading] = useState(true);
-
-//fetching chart data
-  useEffect(() => {
-    const fetchchart = async () => {
-      try {
-        const chart_data = [
-          { name: 'Completed', value: 10, color: '#13ab3eff', legendFontColor: '#333', legendFontSize: 12 },
-          { name: 'Rejected', value: 50, color: '#c40808ff', legendFontColor: '#333', legendFontSize: 12 },
-          { name: 'assigned', value: 20, color: '#445befff', legendFontColor: '#333', legendFontSize: 12 },        ];
-
-        setChart(chart_data);
-      } catch (err) {
-        console.error('Failed to fetch dashboard chart:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchchart();
-  }, []);
   
 //fetching stats data
   useEffect(() => {
@@ -42,7 +22,7 @@ export const UserHome = () => {
         const data = await getDashboard();
 
         const cards = [
-          { id: 1, title: 'High Priority Tasks', value: data.high || 0, icon: '⚠️' },
+          { id: 1, title: 'High Priority Tasks', value: data.assigned? data.high : 0, icon: '⚠️' },
           { id: 2, title: 'Assigned Tasks', value: data.assigned || 0, icon: '📋' },
           { id: 3, title: 'Completed Tasks', value: data.completed || 0, icon: '✅' },
         ];

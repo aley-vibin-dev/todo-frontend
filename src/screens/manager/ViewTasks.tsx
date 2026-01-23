@@ -32,7 +32,7 @@ type UiTask = ApiTask & {
 
 /* ---------------- Fetching tasks ---------------- */
 const fetchTasks = async (): Promise<ApiTask[]> => {
-  const data = await getViewTasks()
+  const data = await getViewTasks();
   return data;
 };
 
