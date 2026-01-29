@@ -7,9 +7,9 @@ import { RootStackParamList } from '@/navigation/AppNavigator'
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '@/context/AuthContext';
 import { useAdminPendingCount } from '@/hooks/useAdminPendingCount';
-import { getAdminSidebarItems } from '@/config/adminSidebar';
+import { getAdminSidebarItems } from '@/config/admin/adminSidebar';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { getAdminNavbarActions } from '@/config/adminNavbar';
+import { getAdminNavbarActions } from '@/config/admin/adminNavbar';
 
 export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({
   children,

@@ -1,111 +1,54 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import {
-  View,
-  Animated,
-  Dimensions,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import { UserSidebar } from './UserSidebar';
-import { UserNavbar } from './UserNavbar';
+import React from 'react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { Navbar } from '@/components/layout/Navbar';
+import { UserStackParamList } from '@/navigation/UserNavigator'
+import { RootStackParamList } from '@/navigation/AppNavigator'
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '@/context/AuthContext';
+import { getUserSidebarItems } from '@/config/user/userSidebar';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { getUserNavbarActions } from '@/config/user/userNavbar';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
+export const UserLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const userNavigation = useNavigation<NativeStackNavigationProp<UserStackParamList>>();
+  const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-const SIDEBAR = {
-  COLLAPSED: 0,
-  EXPANDED: SCREEN_WIDTH * 0.5,
-};
+  const { user, logout } = useAuth();
 
-export const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(true);
-  const [showDropdown, setShowDropdown] = useState(false);
 
-  const [pendingCount, setPendingCount] = useState(0); // ← count of pending approvals
+  const sidebarItems = getUserSidebarItems();
 
-  const sidebarWidth = useRef(new Animated.Value(SIDEBAR.COLLAPSED)).current;
-
-  const toggleSidebar = () => setCollapsed(prev => !prev);
-
-  const closeAll = () => {
-    if (!collapsed) setCollapsed(true);
-    if (showDropdown) setShowDropdown(false);
-  };
-
-  // Animate sidebar width
-  useEffect(() => {
-    Animated.timing(sidebarWidth, {
-      toValue: collapsed ? SIDEBAR.COLLAPSED : SIDEBAR.EXPANDED,
-      duration: 0,
-      useNativeDriver: false,
-    }).start();
-
-    if (!collapsed) setShowDropdown(false);
-  }, [collapsed]);
-
-  const hamburgerLeft = sidebarWidth.interpolate({
-    inputRange: [SIDEBAR.COLLAPSED, SIDEBAR.EXPANDED],
-    outputRange: [12, SIDEBAR.EXPANDED - 40],
-    extrapolate: 'clamp',
+  const navbarActions = getUserNavbarActions({
+    logout,
+    navigationUser: userNavigation,
+    navigationRoot: rootNavigation,
   });
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ flex: 1, flexDirection: 'row' }}>
-        {/* Sidebar */}
-        <Animated.View style={{ width: sidebarWidth }}>
-          <UserSidebar
-            collapsed={collapsed}
-            sidebarWidth={sidebarWidth}
-            pendingCount={pendingCount} // ← pass the dynamically fetched count
-          />
-        </Animated.View>
-
-        {/* Hamburger */}
-        <Animated.View
-          style={{
-            position: 'absolute',
-            top: 70,
-            left: hamburgerLeft,
-            zIndex: 1000,
+    <DashboardLayout
+      sidebar={
+        <Sidebar
+          user={{
+            name: user?.name,
+            email: user?.email,
+            avatar: require('@/../assets/avatar.png'),
           }}
-        >
-          <TouchableOpacity onPress={toggleSidebar} activeOpacity={0.7}>
-            <View style={{ justifyContent: 'center', alignItems: 'flex-start' }}>
-              <View style={{ height: 2, width: 24, backgroundColor: 'white', borderRadius: 1, marginBottom: 4 }} />
-              <View style={{ height: 2, width: collapsed ? 24 : 14, backgroundColor: 'white', borderRadius: 1, marginBottom: 4 }} />
-              <View style={{ height: 2, width: collapsed ? 24 : 8, backgroundColor: 'white', borderRadius: 1 }} />
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* Main content */}
-        <View style={{ flex: 1 }}>
-          <UserNavbar
-            collapsed={collapsed}
-            showDropdown={showDropdown}
-            setShowDropdown={setShowDropdown}
-          />
-
-          <TouchableWithoutFeedback onPress={closeAll}>
-            <View style={{ flex: 1 }}>{children}</View>
-          </TouchableWithoutFeedback>
-
-          {/* Dim overlay */}
-          {!collapsed && (
-            <View
-              pointerEvents="none"
-              style={{
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0,
-                backgroundColor: 'rgba(0,0,0,0.15)',
-              }}
-            />
-          )}
-        </View>
-      </View>
-    </View>
+          menuItems={sidebarItems}
+          navigation={userNavigation}
+        />
+      }
+      navbar={
+        <Navbar
+          title="User Portal"
+          userLabel={`👨🏻‍💼 ${(user?.role ?? '')?.charAt(0).toUpperCase() + (user?.role ?? '')?.slice(1)}`}
+          actions={navbarActions}
+        />
+      }
+    >
+      {children}
+    </DashboardLayout>
   );
 };
